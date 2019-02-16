@@ -8,6 +8,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import { withStyles } from '@material-ui/core/styles';
+import { async } from 'rxjs/internal/scheduler/async';
 
 const styles = theme => ({
   root: {
@@ -18,36 +19,26 @@ const styles = theme => ({
   table: {
     minWidth: 1080
   }
-})
-
-const customers = [
-  {
-    'id': 1,
-    'image': 'https://placeimg.com/64/64/1',
-    'name': '이다산',
-    'birthday': '991231',
-    'gender': '여',
-    'job': '불합자'
-  },
-  {
-    'id': 2,
-    'image': 'https://placeimg.com/64/64/2',
-    'name': '개룸관',
-    'birthday': '190216',
-    'gender': '남',
-    'job': '건축가'
-  },
-  {
-    'id': 3,
-    'image': 'https://placeimg.com/64/64/3',
-    'name': '이대칭',
-    'birthday': '910119',
-    'gender': '여',
-    'job': '사기꾼'
-  }
-]
+});
 
 class App extends Component {
+
+  state = {
+    customers: ""
+  }
+
+  componentDidMount() {
+    this.callApi()
+      .then(res => this.setState({customers: res}))
+      .catch(err => console.log(err));
+  }
+
+  callApi = async () => {
+    const response = await fetch('/api/customers');
+    const body = await response.json();
+    return body;
+  }
+
   render() {
     const { classes } = this.props;
     return (
@@ -65,7 +56,7 @@ class App extends Component {
           </TableHead>
           <TableBody>
             {
-              customers.map(c => { return (
+              this.state.customers ? this.state.customers.map(c => { return (
                   <Customer
                     key={c.id} 
                     id={c.id}
@@ -77,7 +68,7 @@ class App extends Component {
                   />
                 );
               })
-            }
+            : ""}
           </TableBody>
         </Table>
       </Paper>
